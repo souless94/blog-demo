@@ -1,0 +1,53 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog App</title>
+
+  <!-- libraries -->
+  <!-- daisy ui -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+</head>
+
+<body>
+
+  <!-- navbar -->
+  <div class="navbar bg-base-200 rounded-box h-2">
+    <div class="container mx-auto">
+      <div class="flex-1 ">
+        <a class="btn btn-ghost normal-case text-xl">SoulBlog</a>
+      </div>
+      <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+          <li><a class="link link-ghost link-hover normal-case text-xl">Posts</a></li>
+          <li><a class="link link-ghost link-hover normal-case text-xl">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- hero page to introduce user to blog page -->
+  <div class="hero min-h-screen container mx-auto" style="background-image: url('./assets/img/blog-main.jpg');">
+    <div class="hero-overlay bg-opacity-60"></div>
+    <div class="hero-content text-center text-info-content">
+      <div class="max-w-md">
+        <h1 class="mb-5 text-5xl font-bold">Welcome to Soul Blog</h1>
+        <p class="mb-5 text-3xl">Come check out cool posts or announcements &#33;</p>
+        <button class="btn btn-ghost btn-outline">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer footer-center p-2 bg-base-300 text-base-content rounded-box">
+    <div>
+      <p>Copyright © 2023 </p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
