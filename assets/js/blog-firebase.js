@@ -66,4 +66,13 @@ export async function addPost() {
     });
 }
 
+export function deletePost() {
+    console.log('delete Post');
+   
+}
+
+export function updatePost() {
+    console.log('update Post');
+   
+}
 

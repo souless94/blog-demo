@@ -66,9 +66,12 @@
     const firebaseFunctions = {};
   </script>
   <script type="module">
-    import { signInFirebase, signOutFirebase } from '/assets/js/blog-firebase.js';
+    import { signInFirebase, signOutFirebase, addPost, deletePost, updatePost } from '/assets/js/blog-firebase.js';
     firebaseFunctions.signIn = signInFirebase;
     firebaseFunctions.signOut = signOutFirebase;
+    firebaseFunctions.addPost = addPost;
+    firebaseFunctions.deletePost = deletePost;
+    firebaseFunctions.updatePost = updatePost;
   </script>
   <script>
     function isSignedIn() {
@@ -107,7 +110,7 @@
       <input type="file" class="file-input file-input-bordered file-input-primary w-full max-w-xs" />
     </div>
     <div class="pt-2">
-      <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.addDoc()">Create Post</button>
+      <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.addPost()">Create Post</button>
     </div>
   </div>
   <div class="container mx-auto">
@@ -120,10 +123,18 @@
         Loading Results
       </div>
     </div>
-    <p id="content">Start</p>
+    <div x-data="{}">
+      <p id="content">Start</p>
+    </div>
     <template id="blog">
       <p>{post_heading}</p>
       <p>{post_content}</p>
+      <div class="pt-2">
+        <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.updatePost({name})">Update
+          Post</button>
+        <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.deletePost({name})">delete
+          Post</button>
+      </div>
     </template>
 </body>
 
