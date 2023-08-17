@@ -15,8 +15,8 @@
 
   <!-- htmx js for data display -->
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/nunjucks@3.2.4/browser/nunjucks.min.js"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+  <script src="https://unpkg.com/mustache@latest"></script>
 
 
 </head>
@@ -107,24 +107,36 @@
       <input type="file" class="file-input file-input-bordered file-input-primary w-full max-w-xs" />
     </div>
     <div class="pt-2">
-      <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.addDoc()">Create Post</button>
+      <button class="btn btn-outline btn-primary" @click="await test()">Create Post</button>
     </div>
   </div>
+
+
+
   <div class="container mx-auto">
     <div class="divider"></div>
   </div>
   <div class="hero min-h-screen container mx-auto">
     <div hx-ext="client-side-templates">
-      <div hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts/"
-        hx-trigger="load" hx-swap="innerHTML" hx-target="#content" nunjucks-template="blog">
-        Loading Results
-      </div>
+      <button hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts"
+        hx-trigger="click" hx-swap="innerHTML" hx-target="#content"  mustache-template="blog">
+        click here
+      </button>
+
+      <p id="content">Start</p>
+      <template id="blog">
+        {{#documents}}
+        <p>{{name}}</p>
+        {{/documents}}
+      </template>
     </div>
-    <p id="content">Start</p>
-    <template id="blog">
-      <p>{post_heading}</p>
-      <p>{post_content}</p>
-    </template>
+
+    <script>
+      // Remove all extra htmx headers, re-add content-type.
+      document.body.addEventListener('htmx:configRequest', function (event) {
+        event.detail.headers = ''
+      });
+    </script>
 </body>
 
 </html>
