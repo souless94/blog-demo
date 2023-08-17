@@ -10,15 +10,14 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
 
-
+  <!-- alpine js for interactive -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+  <!-- htmx js for data display -->
+  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nunjucks@3.2.4/browser/nunjucks.min.js"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
-  <!-- Default theme -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
 
 </head>
 
@@ -74,36 +73,58 @@
   <script>
     function isSignedIn() {
       const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
-      if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined) 
+      if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
         return false;
       return localStorage.getItem('uid') === whitelist_user;
     }
   </script>
-  <!-- hero page to introduce user to blog page -->
-  <div class="hero min-h-screen container mx-auto" style="background-image: url('./assets/img/blog-main.jpg');">
-    <div class="hero-overlay bg-opacity-60"></div>
-    <div class="hero-content text-center text-info-content">
-      <div class="max-w-md">
-        <h1 class="mb-5 text-5xl font-bold">Welcome to Soul Blog</h1>
-        <p class="mb-5 text-3xl"><svg class="w-6 h-6 text-gray-800 dark:text-white inline-flex" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M18 5h1v12a2 2 0 0 1-2 2m0 0a2 2 0 0 1-2-2V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v15a2 2 0 0 0 2 2h14ZM10 4h2m-2 3h2m-8 3h8m-8 3h8m-8 3h8M4 4h3v3H4V4Z" />
-          </svg> Come check out cool posts or announcements &#33;</p>
-        <button class="btn btn-ghost btn-outline "><a href="pages/posts.html">View Posts <svg
-              class="w-4 h-4 text-gray-800 dark:text-white inline-flex" aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10 16.5c0-1-8-2.7-9-2V1.8c1-1 9 .707 9 1.706M10 16.5V3.506M10 16.5c0-1 8-2.7 9-2V1.8c-1-1-9 .707-9 1.706" />
-            </svg></a></button>
+
+
+
+
+  <div x-data="{}" class="container mx-auto p-2">
+    <h1 class="h1">Manage Post</h1>
+    <div class="form-control p-2 ">
+      <label class="label">
+        <span class="label-text">Title</span>
+      </label>
+      <div class="grid grid-cols-2">
+        <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs" />
       </div>
     </div>
-  </div>
-  <footer class="footer footer-center p-2 bg-base-300 text-base-content rounded-box">
-    <div>
-      <p>Copyright &#64; 2023 <small><span class="text-error">&#42;Note This is just a demo</span></small></p>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Content</span>
+      </label>
+      <div class="grid grid-cols-2">
+        <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Bio"></textarea>
+      </div>
     </div>
-  </footer>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Post Image</span>
+      </label>
+      <input type="file" class="file-input file-input-bordered file-input-primary w-full max-w-xs" />
+    </div>
+    <div class="pt-2">
+      <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.addDoc()">Create Post</button>
+    </div>
+  </div>
+  <div class="container mx-auto">
+    <div class="divider"></div>
+  </div>
+  <div class="hero min-h-screen container mx-auto">
+    <div hx-ext="client-side-templates">
+      <div hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts/"
+        hx-trigger="load" hx-swap="innerHTML" hx-target="#content" nunjucks-template="blog">
+        Loading Results
+      </div>
+    </div>
+    <p id="content">Start</p>
+    <template id="blog">
+      <p>{post_heading}</p>
+      <p>{post_content}</p>
+    </template>
 </body>
 
 </html>
