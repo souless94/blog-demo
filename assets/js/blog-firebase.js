@@ -2,6 +2,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -17,18 +18,52 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const provider = new GoogleAuthProvider();
-provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
 const auth = getAuth(app);
-
+const db = getFirestore(app);
 
 // function to login to firebase
 export function signInFirebase() {
     // Initialize Firebase
 
-    signInWithPopup(auth, provider);
-    
+    signInWithPopup(auth, provider).then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
+        // The signed-in user info.
+        const uid = result.user.uid;
+        if (uid != null && uid === whitelist_user) {
+            localStorage.setItem('uid', uid);
+            console.log('signed in');
+            location.reload();
+        } else {
+            signOutFirebase();
+        }
+    });
 };
+// function to logout from firebase
+export function signOutFirebase() {
+    // Initialize Firebase
+    signOut(auth).then(
+        () => {
+            localStorage.removeItem('uid');
+            location.reload();
+            console.log('signed out');
 
+        }
+    );
+}
+// function to add posts from firebas
+export async function addPost() {
+    console.log('adding document');
+    await addDoc(collection(db, "Posts"), {
+        post_head_image_url: "test",
+        post_heading: "CA",
+        post_content: "USA"
+    }).then(function (docRef) {
+        console.log("Document written with ID: ", docRef.id);
+    });
+}
 
 

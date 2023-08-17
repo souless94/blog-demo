@@ -10,7 +10,14 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- alpine js for interactive -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
+
+  <!-- htmx js for data display -->
+  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nunjucks@3.2.4/browser/nunjucks.min.js"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+
 
 </head>
 
@@ -36,12 +43,20 @@
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M18 5h1v12a2 2 0 0 1-2 2m0 0a2 2 0 0 1-2-2V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v15a2 2 0 0 0 2 2h14ZM10 4h2m-2 3h2m-8 3h8m-8 3h8m-8 3h8M4 4h3v3H4V4Z" />
               </svg></a></li>
-          <li x-data="{}"><button class="link link-ghost link-hover normal-case text-xl"
-              @click="firebaseFunctions.signIn()">Login <svg class="w-6 h-6 text-gray-800 dark:text-white inline-flex"
-                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 19a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 11 14H9a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 10 19Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg></button></li>
+          <li x-data="{}">
+            <div x-show="isSignedIn()" x-transition>
+              <button class="link link-ghost link-hover normal-case text-xl" @click="firebaseFunctions.signOut()">Sign
+                Out</button>
+            </div>
+            <div x-show="!isSignedIn()" x-transition>
+              <button class="link link-ghost link-hover normal-case text-xl" @click="firebaseFunctions.signIn()">Login
+                <svg class="w-6 h-6 text-gray-800 dark:text-white inline-flex" aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 19a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 11 14H9a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 10 19Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg></button>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -51,18 +66,65 @@
     const firebaseFunctions = {};
   </script>
   <script type="module">
-    import { signInFirebase } from './assets/js/blog-firebase.js';
+    import { signInFirebase, signOutFirebase } from '/assets/js/blog-firebase.js';
     firebaseFunctions.signIn = signInFirebase;
+    firebaseFunctions.signOut = signOutFirebase;
+  </script>
+  <script>
+    function isSignedIn() {
+      const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
+      if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
+        return false;
+      return localStorage.getItem('uid') === whitelist_user;
+    }
   </script>
 
-  <div class="hero min-h-screen container mx-auto">
 
-    Posts Page in progress
+
+
+  <div x-data="{}" class="container mx-auto p-2">
+    <h1 class="h1">Manage Post</h1>
+    <div class="form-control p-2 ">
+      <label class="label">
+        <span class="label-text">Title</span>
+      </label>
+      <div class="grid grid-cols-2">
+        <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs" />
+      </div>
+    </div>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Content</span>
+      </label>
+      <div class="grid grid-cols-2">
+        <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Bio"></textarea>
+      </div>
+    </div>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Post Image</span>
+      </label>
+      <input type="file" class="file-input file-input-bordered file-input-primary w-full max-w-xs" />
+    </div>
+    <div class="pt-2">
+      <button class="btn btn-outline btn-primary" @click="await firebaseFunctions.addDoc()">Create Post</button>
+    </div>
   </div>
-
-
-
-
+  <div class="container mx-auto">
+    <div class="divider"></div>
+  </div>
+  <div class="hero min-h-screen container mx-auto">
+    <div hx-ext="client-side-templates">
+      <div hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts/"
+        hx-trigger="load" hx-swap="innerHTML" hx-target="#content" nunjucks-template="blog">
+        Loading Results
+      </div>
+    </div>
+    <p id="content">Start</p>
+    <template id="blog">
+      <p>{post_heading}</p>
+      <p>{post_content}</p>
+    </template>
 </body>
 
 </html>

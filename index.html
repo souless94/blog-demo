@@ -13,6 +13,13 @@
 
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+  <!-- Default theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
+
 </head>
 
 <body>
@@ -37,12 +44,20 @@
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M18 5h1v12a2 2 0 0 1-2 2m0 0a2 2 0 0 1-2-2V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v15a2 2 0 0 0 2 2h14ZM10 4h2m-2 3h2m-8 3h8m-8 3h8m-8 3h8M4 4h3v3H4V4Z" />
               </svg></a></li>
-          <li x-data="{}"><button class="link link-ghost link-hover normal-case text-xl"
-              @click="firebaseFunctions.signIn()">Login <svg class="w-6 h-6 text-gray-800 dark:text-white inline-flex"
-                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 19a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 11 14H9a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 10 19Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg></button></li>
+          <li x-data="{}">
+            <div x-show="isSignedIn()" x-transition>
+              <button class="link link-ghost link-hover normal-case text-xl" @click="firebaseFunctions.signOut()">Sign
+                Out</button>
+            </div>
+            <div x-show="!isSignedIn()" x-transition>
+              <button class="link link-ghost link-hover normal-case text-xl" @click="firebaseFunctions.signIn()">Login
+                <svg class="w-6 h-6 text-gray-800 dark:text-white inline-flex" aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 19a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 11 14H9a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 10 19Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg></button>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -52,11 +67,18 @@
     const firebaseFunctions = {};
   </script>
   <script type="module">
-    import { signInFirebase } from './assets/js/blog-firebase.js';
+    import { signInFirebase, signOutFirebase } from '/assets/js/blog-firebase.js';
     firebaseFunctions.signIn = signInFirebase;
+    firebaseFunctions.signOut = signOutFirebase;
   </script>
-
-
+  <script>
+    function isSignedIn() {
+      const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
+      if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined) 
+        return false;
+      return localStorage.getItem('uid') === whitelist_user;
+    }
+  </script>
   <!-- hero page to introduce user to blog page -->
   <div class="hero min-h-screen container mx-auto" style="background-image: url('./assets/img/blog-main.jpg');">
     <div class="hero-overlay bg-opacity-60"></div>
@@ -77,16 +99,11 @@
       </div>
     </div>
   </div>
-
-
-
-
   <footer class="footer footer-center p-2 bg-base-300 text-base-content rounded-box">
     <div>
       <p>Copyright &#64; 2023 <small><span class="text-error">&#42;Note This is just a demo</span></small></p>
     </div>
   </footer>
-
 </body>
 
 </html>
