@@ -18,6 +18,13 @@
   <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
   <script src="https://unpkg.com/mustache@latest"></script>
 
+  <!-- toast libraries alertify -->
+  <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+  <!-- Default theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
+
 
 </head>
 
@@ -62,34 +69,16 @@
     </div>
   </div>
   <script src="/assets/js/blog-firebase.js" type="module" defer></script>
-  <script>
-    const firebaseFunctions = {};
-  </script>
-  <script type="module">
-    import { signInFirebase, signOutFirebase } from '/assets/js/blog-firebase.js';
-    firebaseFunctions.signIn = signInFirebase;
-    firebaseFunctions.signOut = signOutFirebase;
-  </script>
-  <script>
-    function isSignedIn() {
-      const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
-      if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
-        return false;
-      return localStorage.getItem('uid') === whitelist_user;
-    }
-  </script>
 
-
-
-
-  <div x-data="{}" class="container mx-auto p-2">
+  <form x-data="postForm()" class="container mx-auto p-2" @submit.prevent="await submitForm">
     <h1 class="h1">Manage Post</h1>
     <div class="form-control p-2 ">
       <label class="label">
         <span class="label-text">Title</span>
       </label>
       <div class="grid grid-cols-2">
-        <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs" />
+        <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs"
+          x-model="data.title" />
       </div>
     </div>
     <div class="form-control">
@@ -97,41 +86,89 @@
         <span class="label-text">Content</span>
       </label>
       <div class="grid grid-cols-2">
-        <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Bio"></textarea>
+        <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Content"
+          x-model="data.content"></textarea>
       </div>
     </div>
     <div class="form-control">
       <label class="label">
         <span class="label-text">Post Image</span>
       </label>
-      <input type="file" class="file-input file-input-bordered file-input-primary w-full max-w-xs" />
+      <input type="url" class="input input-bordered input-primary w-full max-w-xs" x-model="data.image_url" />
     </div>
     <div class="pt-2">
-      <button class="btn btn-outline btn-primary" @click="await test()">Create Post</button>
+      <button class="btn btn-outline btn-primary" :disabled="loading">Create Post</button>
     </div>
-  </div>
-
-
-
+  </form>
   <div class="container mx-auto">
     <div class="divider"></div>
   </div>
   <div class="hero min-h-screen container mx-auto">
     <div hx-ext="client-side-templates">
-      <button hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts"
-        hx-trigger="click" hx-swap="innerHTML" hx-target="#content"  mustache-template="blog">
-        click here
+      <button class="btn btn-outline btn-primary"
+        hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts"
+        hx-trigger="load,click" hx-swap="innerHTML" hx-target="#content" mustache-template="blog">
+        Refresh Data
       </button>
-
-      <p id="content">Start</p>
+      <p id="content"></p>
       <template id="blog">
-        {{#documents}}
-        <p>{{name}}</p>
-        {{/documents}}
+        <div class="grid grid-cols-2 gap-4" x-data="{}">
+          {{#documents}}
+          <div class="card bg-base-100 shadow-xl">
+            <figure class="px-10 pt-10">
+              <img src="{{fields.image_url.stringValue}}" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+              <h2 class="card-title">{{fields.title.stringValue}}</h2>
+              <p>{{fields.content.stringValue}}</p>
+              <div class="card-actions">
+                <input type="hidden" id="deleteId" x-ref="deleteId" value="{{name}}">
+                <button class="btn btn-error btn-outline" @click="await deletePostWeb">Delete Post</button>
+              </div>
+            </div>
+          </div>
+          {{/documents}}
+        </div>
+        
       </template>
     </div>
 
-    <script>
+    <script type="text/javascript">
+      const firebaseFunctions = {};
+      function isSignedIn() {
+        const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
+        if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
+          return false;
+        return localStorage.getItem('uid') === whitelist_user;
+      }
+      function postForm() {
+        return {
+          data: { title: '', content: '', image_url: '' },
+          loading: false,
+          async submitForm() {
+            this.loading = true;
+            const message = await firebaseFunctions.addPost(this.data);
+            alertify.success(message);
+            this.data = { title: '', content: '', image_url: '' };
+            this.loading = false;
+            location.reload()
+          }
+        }
+      }
+      async function deletePostWeb() {
+        const deletePostId = String(this.$refs.deleteId.value);
+        const message = await firebaseFunctions.deletePost(deletePostId);
+        alertify.success(message);
+      }
+    </script>
+    <script type="module">
+      import { signInFirebase, signOutFirebase, addPost, deletePost } from '/assets/js/blog-firebase.js';
+      firebaseFunctions.signIn = signInFirebase;
+      firebaseFunctions.signOut = signOutFirebase;
+      firebaseFunctions.addPost = addPost;
+      firebaseFunctions.deletePost = deletePost;
+    </script>
+    <script type="text/javascript">
       // Remove all extra htmx headers, re-add content-type.
       document.body.addEventListener('htmx:configRequest', function (event) {
         event.detail.headers = ''

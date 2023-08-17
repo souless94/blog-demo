@@ -2,7 +2,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -50,29 +50,44 @@ export function signOutFirebase() {
             localStorage.removeItem('uid');
             location.reload();
             console.log('signed out');
-
         }
     );
 }
-// function to add posts from firebas
-export async function addPost() {
-    console.log('adding document');
-    await addDoc(collection(db, "Posts"), {
-        post_head_image_url: "test",
-        post_heading: "CA",
-        post_content: "USA"
-    }).then(function (docRef) {
-        console.log("Document written with ID: ", docRef.id);
+
+function isSignedIn() {
+    const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
+    if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
+        return false;
+    return localStorage.getItem('uid') === whitelist_user;
+}
+
+// function to add posts from firebase
+export async function addPost(data) {
+    let message = 'You are not authorised to create/update/delete posts';
+    if (!isSignedIn()) {
+        return message;
+    }
+    await addDoc(collection(db, "Posts"), data).then(function (docRef) {
+        message = 'document created ';
     });
+    return message;
 }
 
-export function deletePost() {
-    console.log('delete Post');
-   
+export async function deletePost(deletePostId) {
+    console.log(deletePostId);
+    // hard code the response that it will always be the last 
+    const idToDelete= deletePostId.split('/')[6];
+    alert(idToDelete);
+    let message = 'You are not authorised to create/update/delete posts';
+    if (!isSignedIn()) {
+        return message;
+    }
+    await deleteDoc(doc(db, "Posts", idToDelete)).then(function (docRef) {
+        message = 'document deleted ';
+    });
+    return message;
+
 }
 
-export function updatePost() {
-    console.log('update Post');
-   
-}
+
 
