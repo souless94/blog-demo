@@ -9,27 +9,20 @@
   <!-- daisy ui -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- alpine js for interactive -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
-
   <!-- htmx js for data display -->
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
   <script src="https://unpkg.com/mustache@latest"></script>
-
   <!-- toast libraries alertify -->
   <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
   <!-- CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
   <!-- Default theme -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
-
-
 </head>
-
 <body>
-
   <!-- navbar -->
   <div class="navbar bg-base-200 rounded-box h-2">
     <div class="container mx-auto">
@@ -69,37 +62,36 @@
     </div>
   </div>
   <script src="/assets/js/blog-firebase.js" type="module" defer></script>
-
-  <form x-data="postForm()" class="container mx-auto p-2" @submit.prevent="await submitForm">
-    <h1 class="h1">Manage Post</h1>
-    <div class="form-control p-2 ">
-      <label class="label">
-        <span class="label-text">Title</span>
-      </label>
-      <div class="grid grid-cols-2">
-        <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs"
-          x-model="data.title" />
+    <form x-show="isSignedIn()" x-data="postForm()" class="container mx-auto p-2" @submit.prevent="await submitForm">
+      <h1 class="h1">Manage Post</h1>
+      <div class="form-control p-2 ">
+        <label class="label">
+          <span class="label-text">Title</span>
+        </label>
+        <div class="grid grid-cols-2">
+          <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full max-w-xs"
+            x-model="data.title" />
+        </div>
       </div>
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Content</span>
-      </label>
-      <div class="grid grid-cols-2">
-        <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Content"
-          x-model="data.content"></textarea>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Content</span>
+        </label>
+        <div class="grid grid-cols-2">
+          <textarea class="textarea textarea-bordered textarea-lg textarea-primary" placeholder="Content"
+            x-model="data.content"></textarea>
+        </div>
       </div>
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Post Image</span>
-      </label>
-      <input type="url" class="input input-bordered input-primary w-full max-w-xs" x-model="data.image_url" />
-    </div>
-    <div class="pt-2">
-      <button class="btn btn-outline btn-primary" :disabled="loading">Create Post</button>
-    </div>
-  </form>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Post Image</span>
+        </label>
+        <input type="url" class="input input-bordered input-primary w-full max-w-xs" x-model="data.image_url" />
+      </div>
+      <div class="pt-2">
+        <button class="btn btn-outline btn-primary" :disabled="loading">Create Post</button>
+      </div>
+    </form>
   <div class="container mx-auto">
     <div class="divider"></div>
   </div>
@@ -122,7 +114,7 @@
             <div class="card-body items-center text-center">
               <h2 class="card-title">{{fields.title.stringValue}}</h2>
               <p>{{fields.content.stringValue}}</p>
-              <div class="card-actions">
+              <div class="card-actions" x-show="isSignedIn()">
                 <input type="hidden" id="deleteId" x-ref="deleteId" value="{{name}}">
                 <button class="btn btn-error btn-outline" @click="await deletePostWeb">Delete Post</button>
               </div>
@@ -130,10 +122,8 @@
           </div>
           {{/documents}}
         </div>
-
       </template>
     </div>
-
     <script type="text/javascript">
       const firebaseFunctions = {};
       function isSignedIn() {
@@ -189,5 +179,4 @@
       });
     </script>
 </body>
-
 </html>

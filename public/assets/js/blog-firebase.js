@@ -5,7 +5,6 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'https://w
 import { getFirestore, collection, addDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCjTFj7cE0l-CFMsnxvl5RM2bcvnKAHyL4",
@@ -15,13 +14,10 @@ const firebaseConfig = {
     messagingSenderId: "496457057942",
     appId: "1:496457057942:web:228e4eda3afb4ae44c64b7"
 };
-
 const app = initializeApp(firebaseConfig);
 const provider = new GoogleAuthProvider();
-
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 // function to login to firebase
 export function signInFirebase() {
     // Initialize Firebase
@@ -53,14 +49,12 @@ export function signOutFirebase() {
         }
     );
 }
-
 function isSignedIn() {
     const whitelist_user = "wyOmQq1XLXZyyJfnZJZ7FCzKBJU2";
     if (localStorage.getItem('uid') === null || localStorage.getItem('uid') === undefined)
         return false;
     return localStorage.getItem('uid') === whitelist_user;
 }
-
 // function to add posts from firebase
 export async function addPost(data) {
     let message = 'You are not authorised to create/update/delete posts';
@@ -72,7 +66,6 @@ export async function addPost(data) {
     });
     return message;
 }
-
 export async function deletePost(deletePostId) {
     console.log(deletePostId);
     // hard code the response that it will always be the last 
@@ -88,6 +81,3 @@ export async function deletePost(deletePostId) {
     return message;
 
 }
-
-
-
