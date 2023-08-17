@@ -107,7 +107,8 @@
     <div hx-ext="client-side-templates">
       <button class="btn btn-outline btn-primary"
         hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts"
-        hx-trigger="load,click" hx-swap="innerHTML" hx-target="#content" mustache-template="blog">
+        hx-trigger="load,click" hx-swap="innerHTML" hx-target="#content" mustache-template="blog" hx-trigger="revealed"
+        hx-swap="afterend">
         Refresh Data
       </button>
       <p id="content"></p>
@@ -129,7 +130,7 @@
           </div>
           {{/documents}}
         </div>
-        
+
       </template>
     </div>
 
@@ -142,23 +143,36 @@
         return localStorage.getItem('uid') === whitelist_user;
       }
       function postForm() {
+        const initialMessage = 'You are not authorised to create/delete posts';
         return {
           data: { title: '', content: '', image_url: '' },
           loading: false,
           async submitForm() {
             this.loading = true;
-            const message = await firebaseFunctions.addPost(this.data);
-            alertify.success(message);
-            this.data = { title: '', content: '', image_url: '' };
-            this.loading = false;
-            location.reload()
+            if (!isSignedIn()) {
+              alertify.error(initialMessage);
+              this.loading = false;
+            }
+            else {
+              const message = await firebaseFunctions.addPost(this.data);
+              alertify.success(message);
+              this.data = { title: '', content: '', image_url: '' };
+              this.loading = false;
+
+            }
           }
         }
       }
       async function deletePostWeb() {
         const deletePostId = String(this.$refs.deleteId.value);
-        const message = await firebaseFunctions.deletePost(deletePostId);
-        alertify.success(message);
+        const initialMessage = 'You are not authorised to create/delete posts';
+        if (!isSignedIn()) {
+          alertify.error(initialMessage);
+        }
+        else {
+          const message = await firebaseFunctions.deletePost(deletePostId);
+          alertify.success(message);
+        }
       }
     </script>
     <script type="module">
