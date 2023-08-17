@@ -15,8 +15,8 @@
 
   <!-- htmx js for data display -->
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  <script src="https://unpkg.com/mustache@latest"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+  <script src="https://unpkg.com/mustache@latest"></script>
 
 
 </head>
@@ -119,14 +119,17 @@
   <div class="hero min-h-screen container mx-auto">
     <div hx-ext="client-side-templates">
       <button hx-get="https://firestore.googleapis.com/v1/projects/blog-demo-75249/databases/(default)/documents/Posts"
-        hx-trigger="load" hx-swap="innerHTML" hx-target="#content" mustache-template="blog">
-        Loading Results
+        hx-trigger="click" hx-swap="innerHTML" hx-target="#content"  mustache-template="blog">
+        click here
       </button>
+
+      <p id="content">Start</p>
+      <template id="blog">
+        {{#documents}}
+        <p>{{name}}</p>
+        {{/documents}}
+      </template>
     </div>
-    <p id="content">Start</p>
-    <template id="blog">
-      <p>{{document}}</p>
-    </template>
 
     <script>
       // Remove all extra htmx headers, re-add content-type.
