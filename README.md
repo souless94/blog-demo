@@ -18,3 +18,4 @@ Admin Login - only Authorised User who is able to Create / Delete Posts
 3. HTMX Extension (mustache js) - To process data from firestore rest api as it is json response
 4. Alertify - To add in some toast
 5. Alpine - For javascript interactivity. 
+6. Firebase - For the backend ( Authentication and firestore as DataBase )
